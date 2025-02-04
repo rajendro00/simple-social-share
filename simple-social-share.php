@@ -1,90 +1,155 @@
-<?php 
-
+<?php
 /**
- * Plugin Name: Simple Social Share
+ * Plugin Name: Zoo Practice
  * Plugin URI: https://akash.com
  * Description: This is a professional basement plugin
  * Version: 1.0.0
- * Author: Rajendro
+ * Author: Akash
  * Author URI: https://akash.com
  * License: GPL2
- * Text Domain: zoo
+ * Text Domain: zoo-practice
  */
 
- if(!defined('ABSPATH')) {
-     die;
- }
-
- class simple_social_share{
-
-    public function __construct(){
-        add_action('admin_menu', [$this, 'simple_social_share_admin']);
-        add_action('admin_init', [$this, 'simple_social_share_settings_save']);
+ class zoo_practice{
+    public function __construct()
+    {
+      add_action('admin_menu', [$this, 'zoo_practice_setting']);
+      add_action('admin_init', [$this, 'zoo_boss_save']);
+      add_action('the_content', [$this, 'zoo_display_data']);
     }
 
     /**
-     * Admin Menu Page
-     */
+     * Admin menu
+    */
 
-     public function simple_social_share_admin(){
-        add_menu_page(
-            esc_html__('Simple Social Share Settings', 'simple-social-share'),
-            esc_html__('Social Share', 'simple-social-share'),
-            'manage_options',
-            'simple-social-share',
-            [$this, 'simple_social_share_settings_callback'],
-            'dashicons-admin-settings',
-            61
-        );
-     }
+    public function zoo_practice_setting(){
+      add_menu_page(
+        esc_html__('Zoo Boss', 'zoo-practice'),
+        esc_html__('Zoo Boss', 'zoo-practice'),
+        'manage_options',
+        'zoo-boss',
+        [$this, 'zoo_boss_setting'],
+        'dashicons-admin-generic',
+        61
+      );
+    }
 
-     public function simple_social_share_settings_callback(){
-        ?>
-        <h1>Simple Social Share Settings</h1>
+    public function zoo_boss_setting(){
+     ?>
+     <h1>Practice Form</h1>
 
-        <form action="" method="post">
-            <?php  
-            $message = get_option('custom_message');
+     <form action="" method="post">
+      <?php
+      $messege = get_option('zoo_name');
+      
+      // echo $messege;
+      echo '<pre>';
+      print_r( $messege);
+      echo '</pre>';
+      
+
+      $user_name = isset($messege['user_name']) ? $messege['user_name'] : '';
+      $user_email = isset($messege['user_email']) ? $messege['user_email'] : '';
+      $user_textarea = isset($messege['user_textara']) ? $messege['user_textara'] : '';
+      $user_number = isset($messege['number_input']) ? $messege['number_input'] : '';
+      $user_password = isset($messege['password_input']) ? str_repeat('*', strlen($messege['password_input'])) : '';
+      
+      ?>
+        <table class="form-table">
+            <!-- Text Input -->
+            <tr>
+                <th scope="row">
+                    <label for="text_input">Text Input:</label>
+                </th>
+                <td>
+                    <input type="text" name="zoo_name[user_name]" value="<?php echo esc_attr($user_name); ?>" placeholder="inter your name.."><br> <br>
+                </td>
+            </tr>
             
-           if(!array($message)){
-            $message =[
-                'user_name' => '',
-                'user_email' => '',
-                'user_textarea' => '',
-            ];
-           }
+            <!-- Number Input -->
+            <tr>
+                <th scope="row">
+                    <label for="number_input">Number Input:</label>
+                </th>
+                <td>
+                    <input type="number" name="zoo_name[number_input]" value="<?php echo esc_attr($user_number); ?>" id="number_input" class="regular-text">
+                </td>
+            </tr>
 
-           echo "<p>" . esc_html($message['user_name']) . "</p>";
-           echo "<p>" . esc_html($message['user_email']) . "</p>";
-           echo "<p>" . esc_html($message['user_textarea']) . "</p>";
+            <!-- Email Input -->
+            <tr>
+                <th scope="row">
+                    <label for="email_input">Email:</label>
+                </th>
+                <td>
+                <input type="email" name="zoo_name[user_email]" value="<?php echo esc_attr($user_email); ?>" placeholder="inter your name.."><br> <br>
+                </td>
+            </tr>
+
+            <!-- Password Input -->
+            <tr>
+                <th scope="row">
+                    <label for="password_input">Password:</label>
+                </th>
+                <td>
+                    <input type="password" name="zoo_name[password_input]" value="<?php echo esc_attr($user_password); ?>" id="password_input" class="regular-text">
+                </td>
+            </tr>
+
+            <!-- Textarea -->
+            <tr>
+                <th scope="row">
+                    <label for="textarea_input">Textarea:</label>
+                </th>
+                <td>
+                  <textarea name="zoo_name[user_textara]" id=""><?php echo esc_html($user_textarea); ?></textarea><br> <br>
+                </td>
+            </tr>
+        </table>
+
+
+      <?php submit_button('Update', 'primary', 'submit'); ?>
+     </form>
+
+     <?php
+    }
+
+    public function zoo_boss_save(){
+      if(isset($_POST['submit']) && !empty($_POST['zoo_name'])){
+        update_option('zoo_name', $_POST['zoo_name']);
+      }
+    }
+
+    public function zoo_display_data($content){
+        if(is_single()){
+            $messege = get_option('zoo_name');
+
+            if(!empty($messege)){
+                $user_name = isset($messege['user_name']) ? $messege['user_name'] : '';
+                $user_email = isset($messege['user_email']) ? $messege['user_email'] : '';
+                $user_textarea = isset($messege['user_textara']) ? $messege['user_textara'] : '';
+                $user_number = isset($messege['number_input']) ? $messege['number_input'] : '';
+                $user_password = isset($messege['password_input']) ? str_repeat('*', strlen($messege['password_input'])) : '';
             
-            ?>  
-            <input type="text" name="custom_message[user_name]" value="<?php echo esc_attr($message['user_name']); ?>" placeholder="inter your text.." /><br><br>
-            <input type="email" name="custom_message[user_email]" value="<?php echo esc_attr($message['user_email']); ?>" placeholder="inter your email.." /><br><br>
-            <textarea name="custom_message[user_textarea]" id="" placeholder="Enter your message" ></textarea>
-
-            <?php  submit_button('Save', 'primary', 'my_form_submit'); ?>  
-        </form>
-
-        <?php
-     }
-
-     public function simple_social_share_settings_save(){
-        
-        
-        if(isset($_POST['my_form_submit']) && !empty($_POST['custom_message'])){
-
-            $settings = [
-                'user_name' => sanitize_text_field($_POST['custom_message']['user_name']),
-                'user_email' => sanitize_email($_POST['custom_message']['user_email']),
-                'user_textarea' => sanitize_textarea_field($_POST['custom_message']['user_textarea']),
-            ];
-
-            update_option('custom_message', $settings);
+                $html = '';
+                $html .= '<p> Name: '.$user_name.' </p>';
+                $html .= '<p> Email: '.$user_email.' </p>';
+                $html .= '<p> Textarea: '.$user_textarea.' </p>';
+                $html .= '<p> Number: '.$user_number.' </p>';
+                $html .= '<p> Password: '.$user_password.' </p>';
+    
+    
+                return $content.= $html;
+    
+            }
         }
-     }
+        return $content;
+        
+    }
+
+
 
 
  }
 
- new simple_social_share();
+ new zoo_practice();
